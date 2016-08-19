@@ -20,7 +20,7 @@ Swap will remove an entry from the map iff the id is present in the current valu
 Use swap to edit out an entry from the map iff the entry key is present in the map.
 
 ##### Searching in DB
-There can be two ways to search the DB string-pattern-match or using a map as a pattern. The string mach will match the values, without the 'key' constraint. A map match can specifiy which key to map with which value.
+There can be two ways to search the DB string-pattern-match or using a map as a pattern. The string match will match the values, without the 'key' constraint. A map match can specifiy which key to map with which value.
 
 For example, the following map search request will result in finding 
 ```json
