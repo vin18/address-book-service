@@ -70,6 +70,18 @@ _DEPS: prismatic/schema_
 - [:address :house] is an optional key
 - [:address [:apartment :zip :city :state]] are required keys
 
+
+```
+Names, Cities, States and Apartments can only contain letters and spaces
+```
+```
+Phone numbers should only contain 10 digits
+```
+```
+Emails are [alpha-numeric] @ [alpha] .com 
+Invalid emails:: "aa" "aa.com" "@.com" "@gmail.com" "..@.com" "..@gmail.com"
+```
+
 ---
 
 
