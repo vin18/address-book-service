@@ -1,6 +1,4 @@
-# address-book
-
-## Dev Spec
+## address-book (Dev Spec)
 
 ### Components
 - Store 
@@ -58,3 +56,14 @@ To start a web server for the application, run:
 
     lein ring server
 
+To generate documentation, run:
+
+    lein codox
+    
+To format / lint the changes, run:
+
+    lein cljfmt fix
+    
+To run the tests, run:
+
+    lein test
