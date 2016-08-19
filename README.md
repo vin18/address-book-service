@@ -11,7 +11,7 @@ _DEPS: cheshire.core_
 
 The store is the in memory db and is implemented as a atom of {}.
 ##### Adding a new entry in DB
-Adding an entry will swap! the value of the atom iff the new data has valid schema and does violate the DB constraints. Swap will conj the current value of the atom with a gensym generated key and the new-data as value.
+Adding an entry will swap! the value of the atom iff the new data has valid schema and does not violate the DB constraints. Swap will conj the current value of the atom with a gensym generated key and the new-data as value.
 
 ##### Deleting from DB
 Swap will remove an entry from the map iff the id is present in the current value of the map, else throw an exception.
