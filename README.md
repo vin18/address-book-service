@@ -22,6 +22,29 @@ Use swap to edit out an entry from the map iff the entry key is present in the m
 ##### Searching in DB
 There can be two ways to search the DB string-pattern-match or using a map as a pattern. The string mach will match the values, without the 'key' constraint. A map match can specifiy which key to map with which value.
 
+For example, the following map search request will result in finding 
+```json
+{ "name" : "jane",  "house" : "420"}
+```
+
+```json
+[
+  {
+    "name": "Jane Doe",
+    "email": "jane@doetech.com",
+    "phone": "6502603255",
+    "address": {
+      "house": "420",
+      "apartment": "Bellview Complex",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94107"
+    }
+  }
+]
+````
+
+
 ---
 
 #### Handlers
