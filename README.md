@@ -1,12 +1,56 @@
 # address-book
 
-FIXME
+## Dev Spec
 
-## Prerequisites
+### Components
+- Store 
+- Handlers 
+- Schema Validator
 
-You will need [Leiningen][] 2.0.0 or above installed.
+---
+#### Store
+_DEPS: cheshire.core_
 
-[leiningen]: https://github.com/technomancy/leiningen
+The store is the in memory db and is implemented as a atom of {}.
+##### Adding a new entry in DB
+Adding an entry will swap! the value of the atom iff the new data has valid schema and does violate the DB constraints. Swap will conj the current value of the atom with a gensym generated key and the new-data as value.
+
+##### Deleting from DB
+Swap will remove an entry from the map iff the id is present in the current value of the map, else throw an exception.
+
+##### Editing an exsiting entry
+Use swap to edit out an entry from the map iff the entry key is present in the map.
+
+##### Searching in DB
+There can be two ways to search the DB string-pattern-match or using a map as a pattern. The string mach will match the values, without the 'key' constraint. A map match can specifiy which key to map with which value.
+
+---
+
+#### Handlers
+_DEPS: compojure.core compojure.route cheshire.core ring.middleware.defaults_
+
+| Routes       | Method          |Status            | Description |
+| :------------- |:-------------:|:--------------|:-----|
+| `/address-book/`| POST| status 201 / 500| Creates a new entry in DB| 
+| `/address-book/`| GET| status 201  | Returns a JSON of all the entries in DB| 
+| `/address-book/:id`| GET | status 200 /500| Returns the entry identified by id. |
+|`/address-book/:id`| PUT| status 200 / 500 | Edits the entry identified by the id.|
+|`/address-book/:id`| DELETE | status 200 / 500 | Deletes the entry identified by the id.|
+| `/address-book/search/:sstr`| GET | status 200| Returns a JSON of all the entries which match|
+| `/address-book/search/`| POST | status 200| Returns a JSON of all the entries which match|
+
+---
+#### Schema Validator
+_DEPS: prismatic/schema_
+
+- :name and :email are required keys
+- :phone, and address are optional
+- :address is again a map with
+- [:address :house] is an optional key
+- [:address [:apartment :zip :city :state]] are required keys
+
+---
+
 
 ## Running
 
@@ -14,6 +58,3 @@ To start a web server for the application, run:
 
     lein ring server
 
-## License
-
-Copyright © 2016 FIXME
