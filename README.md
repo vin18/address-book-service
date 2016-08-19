@@ -53,7 +53,7 @@ _DEPS: compojure.core compojure.route cheshire.core ring.middleware.defaults_
 | Routes       | Method          |Status            | Description |
 | :------------- |:-------------:|:--------------|:-----|
 | `/address-book/`| POST| status 201 / 500| Creates a new entry in DB| 
-| `/address-book/`| GET| status 201  | Returns a JSON of all the entries in DB| 
+| `/address-book/`| GET| status 200  | Returns a JSON of all the entries in DB| 
 | `/address-book/:id`| GET | status 200 /500| Returns the entry identified by id. |
 |`/address-book/:id`| PUT| status 200 / 500 | Edits the entry identified by the id.|
 |`/address-book/:id`| DELETE | status 200 / 500 | Deletes the entry identified by the id.|
