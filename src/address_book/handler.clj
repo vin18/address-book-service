@@ -14,9 +14,9 @@
 
 (defroutes app-routes
   (POST "/address-book/" {body :body} (add-new body))
-  (GET "/address-book/:id{G__[0-9]+}/" [id] (get-by-id id))
-  (PUT "/address-book/:id{G__[0-9]+}/" {body :body {id :id} :params} (edit-by-id id body))
-  (DELETE "/address-book/:id{G__[0-9]+}/" [id] (delete-by-id id))
+  (GET "/address-book/:id{[a-zA-Z0-9-]+}/" [id] (get-by-id id))
+  (PUT "/address-book/:id{[a-zA-Z0-9-]+}/" {body :body {id :id} :params} (edit-by-id id body))
+  (DELETE "/address-book/:id{[a-zA-Z0-9-]+}/" [id] (delete-by-id id))
   (GET "/address-book/search/:sstr{[a-zA-Z0-9]+}" [sstr] (search-s sstr))
   (POST "/address-book/search/" {body :body} (search-m body))
   (GET "/address-book/" [] (get-all))

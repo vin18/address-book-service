@@ -19,10 +19,15 @@
                             (partition-by identity xs))))]
     (cond
       (has-duplicates? (map :name (vals new-db-value))) (throw
-                                                         (IllegalStateException. "Duplicate Name"))
+                                                         (ex-info "Duplicate Name" {}))
       (has-duplicates? (map :email (vals new-db-value))) (throw
-                                                          (IllegalStateException. "Duplicate Email"))
+                                                          (ex-info "Duplicate Email" {}))
       :else true)))
+
+(defn ^:private bind-error [f [result err]]
+  (if (nil? err)
+    (f result)
+    [nil err]))
 
 (def ^:private in-memory-db (atom {} :validator db-validator))
 
@@ -34,69 +39,86 @@
 (defn get-db-snapshot
   "This returns the dereferenced value of the atom (DB)"
   []
-  @in-memory-db)
+  [@in-memory-db nil])
+
+(defn get-unique-id
+  []
+  (str (java.util.UUID/randomUUID)))
 
 (defn add-in-db!
   "This method swaps the in-memory-db atom by adding a new key value pair
   The key is auto-generated and also returned iff swap is successful"
   [data]
-  (let [unique_id (str (gensym))]
-    (do
-      (swap! in-memory-db conj [(keyword unique_id) data])
-      unique_id)))
+  (let [unique_id (get-unique-id)]
+    (try
+      (do
+        (swap! in-memory-db conj [(keyword unique_id) data])
+        [{:id unique_id} nil])
+      (catch Exception e [nil (.getMessage e)]))))
 
 (defn get-from-db
   "This returns the value in the atom identified by the arg key"
   [id]
-  (if-let [data (id (get-db-snapshot))]
-    data
-    (throw (Exception. "Not Found"))))
+  (if-let [data (bind-error id (get-db-snapshot))]
+    [data nil]
+    [nil "Not Found"]))
 
 (defn validate-and-add-in-db
   "swap atom iff the data has a valid schema"
   [data]
-  ((comp add-in-db! validate-data) data))
+  (bind-error add-in-db! (validate-data data)))
 
 (defn edit-data-in-db!
   "Try and swap atom iff the key 'id' is present 
-  otherwise throw Not found excepion"
+  otherwise throw"
   [id new-data]
-  (swap! in-memory-db
-         #(conj %
-                (if (contains? % id)
-                  [id new-data]
-                  (throw (Exception. "ID Not Found"))))))
+  (try
+    (do
+      (swap! in-memory-db
+             #(conj %
+                    (if (contains? % id)
+                      [id new-data]
+                      (throw (ex-info "ID Not Found" {})))))
+      ["Record Edited Successfully" nil])
+    (catch Exception e [nil (.getMessage e)])))
 
 (defn delete-from-db!
   "Delete from db (swap atom) iff the id is present in the atom"
   [id]
-  (swap!
-   in-memory-db
-   #(dissoc %
-            (if (contains? % id)
-              id
-              (throw (Exception. "ID Not Found"))))))
+  (try
+    [(swap!
+      in-memory-db
+      #(dissoc %
+               (if (contains? % id)
+                 id
+                 (throw (ex-info "ID Not Found" {})))))
+     nil]
+    (catch Exception e [nil (.getMessage e)])))
 
 (defn validate-and-edit-db
   "Validate the schema before calling edit-data-in-db!"
   [id new-data]
-  (edit-data-in-db! id (validate-data new-data)))
+  (bind-error
+   (partial edit-data-in-db! id)
+   (validate-data new-data)))
 
 (defn search-for-string
   "Search the current value of atom, for values which match the given string"
   [sstr]
-  (filter
-   (fn [xs]
-     (>
-      (count (remove nil? (map
-                           (partial re-find (re-pattern (str "(?i)" sstr)))
-                           (vals xs))))
-      0))
-   (vals (get-db-snapshot))))
+  [(filter
+    (fn [xs]
+      (>
+       (count (remove nil? (map
+                            (partial re-find (re-pattern (str "(?i)" sstr)))
+                            (vals xs))))
+       0))
+    (bind-error vals (get-db-snapshot)))
+   nil])
 
 (defn search-for-map
   "Search the current value of atom using a map as a pattern"
   [find-map]
-  (filter
-   (partial is-pattern-match find-map)
-   (vals (get-db-snapshot))))
+  [(filter
+    (partial is-pattern-match find-map)
+    (bind-error vals (get-db-snapshot)))
+   nil])

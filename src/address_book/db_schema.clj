@@ -30,6 +30,9 @@
                               (s/required-key :zip) zipcode-pred}})
 
 (defn validate-data
-  "Validates the data according to the data-schema"
+  "Validates the data according to the data-schema
+  @return [valid-data-or-nil error-message]"
   [data]
-  (s/validate data-schema data))
+  (try
+    [(s/validate data-schema data) nil]
+    (catch Exception e [nil (.getMessage e)])))

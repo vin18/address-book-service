@@ -9,15 +9,16 @@
   (testing "valid incoming data"
     (let [incoming-data {:name "AaBb" :email "aabb@gg.com"}
           result (validate-data incoming-data)]
-      (is (= result incoming-data))))
+      (is (= result [incoming-data nil]))))
 
   (testing "invalid key in incoming data"
     (let [incoming-data {:naame "AABB"}]
-      (is (thrown? Exception (validate-data incoming-data)))))
+      (is (= [nil "Value does not match schema: {:name missing-required-key, :email missing-required-key, :naame disallowed-key}"]
+             (validate-data incoming-data)))))
 
   (testing "invalid name in incoming data"
     (let [incoming-data {:name "A3434" :email "aabb@gmail.com"}]
-      (is (thrown? Exception (validate-data incoming-data)))))
+      (is ((complement nil?) (second (validate-data incoming-data))))))
 
   (testing "valid phone number should be of 10 digits only"
     (let [valid-num "1234567890"
